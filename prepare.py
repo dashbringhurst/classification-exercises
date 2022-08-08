@@ -4,6 +4,7 @@ import pandas as pd
 
 
 def prep_iris():
+    '''This function takes the iris dataframe from the acquire.py function csv_iris_data() and cleans it.'''
     df_iris = acquire.csv_iris_data()
     df_iris = df_iris.drop(columns=['species_id', 'measurement_id'])
     df_iris = df_iris.rename(columns={'species_name':'species'})
@@ -30,3 +31,11 @@ def prep_telco():
     telco = telco.drop(columns=['gender','partner','dependents','phone_service','multiple_lines','online_security','online_backup','device_protection','tech_support','streaming_tv','streaming_movies','paperless_billing','churn','internet_service_type'])
     return telco
 
+def split_data(df, column):
+    '''This function takes in two arguments, a dataframe and a string. The string argument is the name of the
+        column that will be used to stratify the train_test_split. The function returns three dataframes, a 
+        training dataframe with 60 percent of the data, a validate dataframe with 20 percent of the data and test
+        dataframe with 20 percent of the data.'''
+    train, test = train_test_split(df, test_size=.2, random_state=217, stratify=df[column])
+    train, validate = train_test_split(train, test_size=.25, random_state=217, stratify=train[column])
+    return train, validate, test
