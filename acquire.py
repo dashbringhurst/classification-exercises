@@ -44,3 +44,21 @@ def csv_telco_data():
         df.to_csv(filename, index=False)
         return df  
 
+def get_tidy_data_attendance():
+    return pd.read_sql('SELECT * FROM attendance', get_connection('tidy_data'))
+
+def csv_tidy_data():
+    filename = "tidy_data.csv"
+    if os.path.isfile(filename):
+        return pd.read_csv(filename)
+    else:
+        df = get_tidy_data()
+        df.to_csv(filename, index=False)
+        return df  
+
+def get_tidy_data_coffee():
+    return pd.read_sql('SELECT * FROM coffee_levels', get_connection('tidy_data'))
+
+def get_tidy_data_cake():
+    return pd.read_sql('SELECT * FROM cake_recipes', get_connection('tidy_data'))
+
