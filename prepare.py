@@ -1,6 +1,8 @@
 import os
 import numpy as np
 import pandas as pd
+import acquire
+from sklearn.model_selection import train_test_split
 
 
 def prep_iris():
@@ -21,14 +23,24 @@ def prep_titanic():
     return titanic_db
 
 def prep_telco():
-    telco = acquire.csv_telco_data()
-    telco = telco.drop(columns=['internet_service_type_id','contract_type_id.1','payment_type_id.1','paperless_billing.1','monthly_charges.1','total_charges.1'])
-    telco['customer_id'] = telco.customer_id.str.slice(stop=4).astype(int)
+    telco = acquire.get_telco_data()
+    telco['gender'] = telco.gender.map({'Female': 0, 'Male': 1})
+    telco['partner'] = telco.partner.map({'Yes': 1, 'No': 0})
+    telco['dependents'] = telco.dependents.map({'Yes': 1, 'No': 0})
+    telco['phone_service'] = telco.phone_service.map({'Yes': 1, 'No': 0})
+    telco['paperless_billing'] = telco.paperless_billing.map({'Yes': 1, 'No': 0})
+    telco['churn'] = telco.churn.map({'Yes': 1, 'No': 0})
+    telco['multiple_lines'] = telco.multiple_lines.str.replace('No phone service', 'No')
+    telco['payment_type'] = telco.payment_type.str.replace('Electronic check','manual').str.replace('Mailed check','manual')
+    telco['payment_type'] = telco.payment_type.str.replace('(','').str.replace(')', '').str.replace('Bank transfer automatic', 'auto').str.replace('Credit card automatic', 'auto')
+    telco['streaming_tv'] = telco.streaming_tv.str.replace('No internet service','No')
+    telco['streaming_movies'] = telco.streaming_movies.str.replace('No internet service', 'No')
+    telco['online_security'] = telco.online_security.str.replace('No internet service', 'No')
+    telco['online_backup'] = telco.online_backup.str.replace('No internet service', 'No')
+    telco['device_protection'] = telco.device_protection.str.replace('No internet service', 'No')
+    telco['tech_support'] = telco.tech_support.str.replace('No internet service', 'No')
     telco['total_charges'] = telco.total_charges.str.replace('$','').str.replace(',','').str.replace(' ','').fillna(0)
     telco['total_charges'] = pd.to_numeric(telco.total_charges)
-    dummy_telco = pd.get_dummies(telco[['gender','partner','dependents','phone_service','multiple_lines','online_security','online_backup','device_protection','tech_support','streaming_tv','streaming_movies','paperless_billing','churn','internet_service_type']], drop_first=True)
-    telco = pd.concat([telco, dummy_telco], axis=1)
-    telco = telco.drop(columns=['gender','partner','dependents','phone_service','multiple_lines','online_security','online_backup','device_protection','tech_support','streaming_tv','streaming_movies','paperless_billing','churn','internet_service_type'])
     return telco
 
 def split_data(df, column):
